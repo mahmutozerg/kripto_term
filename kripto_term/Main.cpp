@@ -7,12 +7,10 @@ using namespace std;
 const char* inputFilePath = "C:/Users/karak/Downloads/image.bmp";
 const char* outputPath = "C:/Users/karak/Downloads/test2.bmp";
 
-
-
 int main(void)
 {
 
-    const char* text[] = { "ustam","sifami","yapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsun", nullptr};
+    const char* text[] = { "Ege Kiran","Miyala","313969", nullptr};
     BMPHeader header;
     BMPHeader outputHeader;
 

@@ -37,24 +37,21 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
     vector<int> prevLocs;
     string insertedLocationsHex;
     int i;
-    int numRows = bmpHeader.height;  // Assuming you have a height field in your BMPHeader
+    int numRows = bmpHeader.height;  
     int rowWidth = bmpHeader.width;
 
     int dataIndex = 0;
 
-    // Iterate through data to embed
     for (int dataCounter = 0; datas[dataCounter] != nullptr; )
     {
-        // Calculate a random position within the image
-         i = rand() % imageData.size();
+         i = rand() % (imageData.size()/2);
 
-        // Ensure that the random position does not cross row boundaries
         int rowStart = (i / rowWidth) * rowWidth;
         int rowEnd = rowStart + rowWidth - 1;
 
-        while (i < rowStart || i > rowEnd)
+        while ((i < rowStart || i > rowEnd)) // todo add prvloc check
         {
-            i = rand() % imageData.size();
+            i = rand() % (imageData.size() / 2);
             rowStart = (i / rowWidth) * rowWidth;
             rowEnd = rowStart + rowWidth - 1;
         }
@@ -83,7 +80,7 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
 
         prevLocs.push_back(i);
     }
-    i = rand() % imageData.size();
+    i = rand() % (imageData.size() / 2);
 
     stringstream ss;
     dataIndex = 0;
@@ -92,7 +89,7 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
     insertedLocationsHex.append("EOF");
 
 
-    int randomInsertPos = rand() % imageData.size();
+    int randomInsertPos = rand() % ((imageData.size()/2));
     bmpHeader.start = randomInsertPos;
     cout << "Inserted Indexes are " << bmpHeader.start<<endl;
     // Erase the existing elements at the random position and insert the entire string
@@ -100,6 +97,7 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
     imageData.insert(imageData.begin() + randomInsertPos, insertedLocationsHex.begin(), insertedLocationsHex.end());
 
     // Update BMPHeader sizes
+    bmpHeader.bitDepth = 24;
     bmpHeader.fileSize += insertedLocationsHex.size();
     bmpHeader.imageSize += insertedLocationsHex.size();
 }
@@ -118,7 +116,10 @@ void getOutputFileDataAfter(BMPHeader& header, vector<char>& pixelData, const ch
     {
         insertedLocationsHex.append(1, pixelData[i]);
         if (insertedLocationsHex.find("EOF") != string::npos)
+        {
             break;
+
+        }
 
         if (insertedLocationsHex.find("EOL") != string::npos)
         {
@@ -133,12 +134,6 @@ void getOutputFileDataAfter(BMPHeader& header, vector<char>& pixelData, const ch
             insertedLocationsHex.clear();
             cout << pixelData[loc];
         }
-
-
-
-
-
-
     }
     inp2.close();
 }
