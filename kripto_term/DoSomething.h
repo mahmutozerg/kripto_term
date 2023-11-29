@@ -36,67 +36,73 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
     srand(static_cast<unsigned int>(std::time(nullptr)));
     vector<int> prevLocs;
     string insertedLocationsHex;
-    size_t i = rand() % (imageData.size() / 100);
-    int dataCounter = 0, dataIndex = 0;
-    for (; i < imageData.size(); i = rand() % (imageData.size() / 100))
+    int i;
+    int numRows = bmpHeader.height;  // Assuming you have a height field in your BMPHeader
+    int rowWidth = bmpHeader.width;
+
+    int dataIndex = 0;
+
+    // Iterate through data to embed
+    for (int dataCounter = 0; datas[dataCounter] != nullptr; )
     {
-        if (datas[dataCounter] != nullptr)
+        // Calculate a random position within the image
+         i = rand() % imageData.size();
+
+        // Ensure that the random position does not cross row boundaries
+        int rowStart = (i / rowWidth) * rowWidth;
+        int rowEnd = rowStart + rowWidth - 1;
+
+        while (i < rowStart || i > rowEnd)
         {
-            for (int j = 0; j < prevLocs.size(); ++j) {
-                if (prevLocs[j] == i) {
-                    // Number exists in the vector
-                    i = rand() % (imageData.size() / 100);
-                    j = 0;
-                }
-            }
-            stringstream ss;
-            ss << hex << i;
-            insertedLocationsHex.append(ss.str());
-            prevLocs.push_back(i);
-            imageData[i] = datas[dataCounter][dataIndex];
-            insertedLocationsHex.append("NXT");
-
-            dataIndex++;
-
-            if (datas[dataCounter][dataIndex] == '\0')
-            {
-                stringstream ss;
-
-                dataIndex = 0;
-                dataCounter++;
-                ++i;
-                ss << hex << i;
-
-                insertedLocationsHex.append(ss.str());
-                insertedLocationsHex.append("EOL");
-            }
+            i = rand() % imageData.size();
+            rowStart = (i / rowWidth) * rowWidth;
+            rowEnd = rowStart + rowWidth - 1;
         }
-        else
+
+        // Convert index to hex and append to the string
+        stringstream ss;
+        ss << hex << i;
+        insertedLocationsHex.append(ss.str());
+        insertedLocationsHex.append("NXT");
+
+        // Update the data
+        imageData[i] = datas[dataCounter][dataIndex];
+        cout<<"Data inserted to " << i << endl;
+        dataIndex++;
+
+        // Check for end of data
+        if (datas[dataCounter][dataIndex] == '\0')
         {
             stringstream ss;
-
             dataIndex = 0;
-            dataCounter++;
-            ++i;
             ss << hex << i;
             insertedLocationsHex.append(ss.str());
-            insertedLocationsHex.append("EOF");
-            break;
-
+            insertedLocationsHex.append("EOL");
+            ++dataCounter;
         }
 
+        prevLocs.push_back(i);
     }
-    bmpHeader.start = imageData.size();
+    i = rand() % imageData.size();
 
-    for (auto c : insertedLocationsHex)
-    {
-        imageData.push_back(c);
-    }
+    stringstream ss;
+    dataIndex = 0;
+    ss << hex << i;
+    insertedLocationsHex.append(ss.str());
+    insertedLocationsHex.append("EOF");
 
+
+    int randomInsertPos = rand() % imageData.size();
+    bmpHeader.start = randomInsertPos;
+    cout << "Inserted Indexes are " << bmpHeader.start<<endl;
+    // Erase the existing elements at the random position and insert the entire string
+    imageData.erase(imageData.begin() + randomInsertPos, imageData.begin() + randomInsertPos + insertedLocationsHex.size());
+    imageData.insert(imageData.begin() + randomInsertPos, insertedLocationsHex.begin(), insertedLocationsHex.end());
+
+    // Update BMPHeader sizes
     bmpHeader.fileSize += insertedLocationsHex.size();
     bmpHeader.imageSize += insertedLocationsHex.size();
 }
-
 void getOutputFileDataAfter(BMPHeader& header, vector<char>& pixelData, const char* outputPath)
 {
     string insertedLocationsHex;
@@ -107,7 +113,6 @@ void getOutputFileDataAfter(BMPHeader& header, vector<char>& pixelData, const ch
     pixelData.resize(pixelDataSize);
     inp2.read(pixelData.data(), pixelDataSize);
 
-    std::vector<char> sequenceToFind = { '2', 'e', 'e' };
 
     for (unsigned long long i = header.start; i < pixelData.size(); ++i)
     {

@@ -12,7 +12,7 @@ const char* outputPath = "C:/Users/karak/Downloads/test2.bmp";
 int main(void)
 {
 
-    const char* text[] = { "tst","Mahmutozergozukirmizi","erkek","kayseri","istanbul", nullptr};
+    const char* text[] = { "ustam","sifami","yapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsunyapiyorsun", nullptr};
     BMPHeader header;
     BMPHeader outputHeader;
 
