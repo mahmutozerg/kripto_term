@@ -1,16 +1,15 @@
 #include <iostream>
-
-#include"DoSomething.h"
+#include"Embedder.h"
 
 using namespace std;
 
-const char* inputFilePath = "C:/Users/karak/Downloads/image.bmp";
-const char* outputPath = "C:/Users/karak/Downloads/test2.bmp";
+const char* inputFilePath = "../inputImage.bmp";
+const char* outputPath = "../outputImage.bmp";
 
 int main(void)
 {
 
-    const char* text[] = { "Ege Kiran","Miyala","313969", nullptr};
+    const char* text[] = { "This is a ","Test Data","12345678910", nullptr};
     BMPHeader header;
     BMPHeader outputHeader;
 
@@ -33,7 +32,7 @@ int main(void)
     outputFile.close();
 
     vector<char> outputFilePixelData;
-    getOutputFileDataAfter(outputHeader, outputFilePixelData, outputPath);
+    getEmbededDataFromOutputFile(outputHeader, outputFilePixelData, outputPath);
 
     
     return 0;

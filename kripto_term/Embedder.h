@@ -56,13 +56,19 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
             rowEnd = rowStart + rowWidth - 1;
         }
 
-        // Convert index to hex and append to the string
         stringstream ss;
         ss << hex << i;
         insertedLocationsHex.append(ss.str());
         insertedLocationsHex.append("NXT");
 
-        // Update the data
+        /*
+            #############################
+            Asagidaki satir veriyi kyouyor  
+        
+            #############################
+            imageData[i] = datas[dataCounter][dataIndex];
+            datas[dataCounter][dataIndex] bu sifreli metin olacak
+        */
         imageData[i] = datas[dataCounter][dataIndex];
         cout<<"Data inserted to " << i << endl;
         dataIndex++;
@@ -91,20 +97,19 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
 
     int randomInsertPos = rand() % ((imageData.size()/2));
     bmpHeader.start = randomInsertPos;
-    cout << "Inserted Indexes are " << bmpHeader.start<<endl;
+    cout << "Embedded data Inserted at Index  " << bmpHeader.start<<endl;
     // Erase the existing elements at the random position and insert the entire string
     imageData.erase(imageData.begin() + randomInsertPos, imageData.begin() + randomInsertPos + insertedLocationsHex.size());
     imageData.insert(imageData.begin() + randomInsertPos, insertedLocationsHex.begin(), insertedLocationsHex.end());
 
     // Update BMPHeader sizes
-    bmpHeader.bitDepth = 24;
-    bmpHeader.fileSize += insertedLocationsHex.size();
-    bmpHeader.imageSize += insertedLocationsHex.size();
+    bmpHeader.fileSize = sizeof(BMPHeader) + imageData.size();
+    bmpHeader.imageSize = imageData.size() - bmpHeader.start;
 }
-void getOutputFileDataAfter(BMPHeader& header, vector<char>& pixelData, const char* outputPath)
+void getEmbededDataFromOutputFile(BMPHeader& header, vector<char>& pixelData, const char* outputPath)
 {
     string insertedLocationsHex;
-    unsigned long long  loc;
+    unsigned long long  insertedLocationsInt;
     ifstream inp2 = openInputFile(outputPath);
     inp2.read(reinterpret_cast<char*>(&header), sizeof(BMPHeader));
     size_t pixelDataSize = header.fileSize - header.dataOffset;
@@ -130,9 +135,9 @@ void getOutputFileDataAfter(BMPHeader& header, vector<char>& pixelData, const ch
         if (insertedLocationsHex.find("NXT") != string::npos)
         {
 
-            loc = (stoi(insertedLocationsHex.substr(0, insertedLocationsHex.size() - 3), nullptr, 16));
+            insertedLocationsInt = (stoi(insertedLocationsHex.substr(0, insertedLocationsHex.size() - 3), nullptr, 16));
             insertedLocationsHex.clear();
-            cout << pixelData[loc];
+            cout << pixelData[insertedLocationsInt];
         }
     }
     inp2.close();
