@@ -1,5 +1,4 @@
 #include <cstdint>
-using namespace std;
 
 #pragma pack(push, 1)
 struct BMPHeader {
@@ -31,7 +30,7 @@ struct BMPHeader {
     uint32_t colorsUsed;    // Number of colors used
     uint32_t colorsImportant; // Number of important colors
 
-    uint64_t start;
+    char start[16];
 
 
 };
