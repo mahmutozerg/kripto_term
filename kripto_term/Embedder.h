@@ -30,7 +30,18 @@ ofstream openOutputFile(const char* filePath)
     }
     return outFile;
 }
+void checkAndUpdateIfRowUnvalid(vector<int> prevLocs,vector<char> imageData,int &i , int rowWidth)
+{
+    int rowStart = (i / rowWidth) * rowWidth;
+    int rowEnd = rowStart + rowWidth - 1;
 
+    while ((i < rowStart || i > rowEnd) || find(prevLocs.begin(), prevLocs.end(), i) != prevLocs.end()) // todo add prvloc check
+    {
+        i = rand() % (imageData.size() / 2);
+        rowStart = (i / rowWidth) * rowWidth;
+        rowEnd = rowStart + rowWidth - 1;
+    }
+}
 void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** datas)
 {
     srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -45,16 +56,8 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
     for (int dataCounter = 0; datas[dataCounter] != nullptr; )
     {
          i = rand() % (imageData.size()/2);
+         checkAndUpdateIfRowUnvalid(prevLocs, imageData,i,rowWidth);
 
-        int rowStart = (i / rowWidth) * rowWidth;
-        int rowEnd = rowStart + rowWidth - 1;
-
-        while ((i < rowStart || i > rowEnd)) // todo add prvloc check
-        {
-            i = rand() % (imageData.size() / 2);
-            rowStart = (i / rowWidth) * rowWidth;
-            rowEnd = rowStart + rowWidth - 1;
-        }
 
         stringstream ss;
         ss << hex << i;
@@ -86,18 +89,22 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
 
         prevLocs.push_back(i);
     }
+
     i = rand() % (imageData.size() / 2);
 
+    checkAndUpdateIfRowUnvalid(prevLocs,imageData,i,rowWidth);
+
     stringstream ss;
-    dataIndex = 0;
     ss << hex << i;
     insertedLocationsHex.append(ss.str());
     insertedLocationsHex.append("EOF");
 
-
     int randomInsertPos = rand() % ((imageData.size()/2));
+
+    checkAndUpdateIfRowUnvalid(prevLocs, imageData, randomInsertPos, rowWidth);
     bmpHeader.start = randomInsertPos;
     cout << "Embedded data Inserted at Index  " << bmpHeader.start<<endl;
+
     // Erase the existing elements at the random position and insert the entire string
     imageData.erase(imageData.begin() + randomInsertPos, imageData.begin() + randomInsertPos + insertedLocationsHex.size());
     imageData.insert(imageData.begin() + randomInsertPos, insertedLocationsHex.begin(), insertedLocationsHex.end());
@@ -109,6 +116,7 @@ void embedValue(vector<char>& imageData, BMPHeader& bmpHeader, const char** data
 void getEmbededDataFromOutputFile(BMPHeader& header, vector<char>& pixelData, const char* outputPath)
 {
     string insertedLocationsHex;
+    vector<char> rawData;
     unsigned long long  insertedLocationsInt;
     ifstream inp2 = openInputFile(outputPath);
     inp2.read(reinterpret_cast<char*>(&header), sizeof(BMPHeader));
@@ -128,7 +136,7 @@ void getEmbededDataFromOutputFile(BMPHeader& header, vector<char>& pixelData, co
 
         if (insertedLocationsHex.find("EOL") != string::npos)
         {
-            cout << " ";
+            rawData.push_back(' ');
             insertedLocationsHex.clear();
         }
 
@@ -137,8 +145,12 @@ void getEmbededDataFromOutputFile(BMPHeader& header, vector<char>& pixelData, co
 
             insertedLocationsInt = (stoi(insertedLocationsHex.substr(0, insertedLocationsHex.size() - 3), nullptr, 16));
             insertedLocationsHex.clear();
-            cout << pixelData[insertedLocationsInt];
+            rawData.push_back(pixelData[insertedLocationsInt]);
         }
+
     }
+
+    for (auto c : rawData)
+        cout << c;
     inp2.close();
 }
