@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const char* inputFilePath = "C:/Users/karak/Downloads/image.bmp";
+const char* inputFilePath = "C:/Users/karak/Downloads/image2.bmp";
 const char* outputPath = "C:/Users/karak/Downloads/test2.bmp";
 
 int main(void)
@@ -33,7 +33,7 @@ int main(void)
     outputFile.close();
 
     vector<char> outputFilePixelData;
-    getOutputFileDataAfter(outputHeader, outputFilePixelData, outputPath);
+    getEmbededDataFromOutputFile(outputHeader, outputFilePixelData, outputPath);
 
     
     return 0;
