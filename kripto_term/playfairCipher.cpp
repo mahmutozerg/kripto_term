@@ -10,11 +10,11 @@ using namespace std;
 // Driver code
 int main()
 {
-	char str[SIZE], key[SIZE];
+    char str[SIZE], key[SIZE];
 
-	// Key to be encrypted
-	strcpy(key, "Monarchy");
-	cout << "Key Text: " << key << endl;
+    // Key to be encrypted
+    strcpy(key, "Monarchy");
+    cout << "Key Text: " << key << endl;
 
     // Plain text
     strcpy(str, "instruments");
