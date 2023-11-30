@@ -1,16 +1,15 @@
 #include <iostream>
-
-#include"DoSomething.h"
+#include"Embedder.h"
 
 using namespace std;
 
-const char* inputFilePath = "C:/Users/karak/Downloads/image2.bmp";
-const char* outputPath = "C:/Users/karak/Downloads/test2.bmp";
+const char* inputFilePath = "../inputImage.bmp";
+const char* outputPath = "../outputImage.bmp";
 
 int main(void)
 {
 
-    const char* text[] = { "Ege Kiran","Miyala","313969", nullptr};
+    const char* text[] = { "This is a ","Test Data","12345678910", nullptr};
     BMPHeader header;
     BMPHeader outputHeader;
 
