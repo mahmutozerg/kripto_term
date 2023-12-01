@@ -1,26 +1,25 @@
 #pragma once
 #include <fstream>
 #include <iostream>
-
-std::ifstream openInputFile(const char* filePath)
+using std::ifstream, std::ofstream,std::cerr,std::ios,std::endl;
+ifstream openInputFile(const char* filePath)
 {
-    std::ifstream inputFile(filePath, std::ios::binary);
+    std::ifstream inputFile(filePath, ios::binary);
 
     if (!inputFile.is_open())
     {
-        std::cerr << "Error: Unable to open the input file." << std::endl;
+        cerr << "Error: Unable to open the input file." << endl;
         exit(EXIT_FAILURE);
     }
     return inputFile;
 }
-
-std::ofstream openOutputFile(const char* filePath)
+ofstream openOutputFile(const char* filePath)
 {
-    std::ofstream outFile(filePath, std::ios::binary);
+    ofstream outFile(filePath, ios::binary);
 
     if (!outFile.is_open())
     {
-        std::cerr << "Error: Unable to open the output file." << std::endl;
+        cerr << "Error: Unable to open the output file." << endl;
         exit(EXIT_FAILURE);
     }
     return outFile;
