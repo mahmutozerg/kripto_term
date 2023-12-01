@@ -1,14 +1,14 @@
 #include <iostream>
 #include"Embedder.h"
 
-using namespace std;
+using std::ofstream,std::ifstream, std::srand,std::time;
 
 const char* inputFilePath = "../inputImage.bmp";
 const char* outputPath = "../outputImage.bmp";
 
 int main(void)
 {
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    srand(static_cast<unsigned int>(time(nullptr)));
 
     const char* text = "This is a test data which means that this is a test";
     BMPHeader header;

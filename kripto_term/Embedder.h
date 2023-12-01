@@ -4,30 +4,30 @@
 #include "FileOperations.h"
 #include "Utils.h"
 #include "BMP.h"
-using std::endl, std::cout,std::string,std::hex,std::vector;
+using std::endl, std::cout,std::string,std::hex,std::vector,std::find,std::rand,std::stoi;
 
 
-void checkAndUpdateIfRowUnvalid(std::vector<int> prevInsertedLocations,std::vector<char> imageData,long long int &i)
+void checkAndUpdateIfRowUnvalid(vector<int> prevInsertedLocations,vector<char> imageData,long long int &i)
 {
 
-    while ( std::find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end()) // todo add prvloc check
+    while (find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end()) // todo add prvloc check
     {
         i = rand() % (imageData.size() / 2);
        
     }
 }
-void embedValue(std::vector<char>& imageData, BMPHeader& header, const char* data)
+void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
 {
-    std::vector<int> prevInsertedLocations;
-    const std::vector<char> EOL({'E','O','L'});
-    const std::vector<char> NXT({'N','X','T'});
-    const std::vector<char> _EOF({'E','O','F'});
-    std::string insertedLocationsHex;
+    vector<int> prevInsertedLocations;
+    const vector<char> EOL({'E','O','L'});
+    const vector<char> NXT({'N','X','T'});
+    const vector<char> _EOF({'E','O','F'});
+    string insertedLocationsHex;
     string currentHexValue;
     long long int index,nextIndex;
 
 
-    index = (std::rand() % (int)(imageData.size()));
+    index = (rand() % (int)(imageData.size()));
     checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, index);
     currentHexValue = getHexVal(index);
 
@@ -37,7 +37,7 @@ void embedValue(std::vector<char>& imageData, BMPHeader& header, const char* dat
     {
         cout << index<<endl;
         
-        nextIndex = std::rand() % (int)(imageData.size());
+        nextIndex = rand() % (int)(imageData.size());
         checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, nextIndex);
         imageData[index] = (char)(data[dataIndex++]);
 
@@ -67,23 +67,23 @@ void embedValue(std::vector<char>& imageData, BMPHeader& header, const char* dat
     header.fileSize = sizeof(BMPHeader) + imageData.size();
     header.imageSize = imageData.size() ;
 }
-void getEmbodiedDataFromOutputFile(BMPHeader& header, std::vector<char>& pixelData)
+void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& pixelData)
 {
-    std::string insertedLocationsHex;
-    std::vector<char> unraveledData;
+    string insertedLocationsHex;
+    vector<char> unraveledData;
     int nextIndex;
 
 
-    for (unsigned long long i = std::stoi(header.start,0,sizeof(header.start)); i < pixelData.size(); )
+    for (unsigned long long i = stoi(header.start,0,sizeof(header.start)); i < pixelData.size(); )
     {
         insertedLocationsHex.append(1, pixelData[i]);
-        if (insertedLocationsHex.find("EOF") != std::string::npos)
+        if (insertedLocationsHex.find("EOF") != string::npos)
         {
             unraveledData.push_back((insertedLocationsHex[0]));
 
             break;
 
-        }else if (insertedLocationsHex.find("NXT") != std::string::npos)
+        }else if (insertedLocationsHex.find("NXT") != string::npos)
         {
             nextIndex = (stoi(insertedLocationsHex.substr(1, insertedLocationsHex.size() - 3), nullptr, 16));
             int c = insertedLocationsHex.size();
