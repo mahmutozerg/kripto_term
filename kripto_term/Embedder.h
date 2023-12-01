@@ -9,7 +9,6 @@ using std::endl, std::cout,std::string,std::hex,std::vector;
 void checkAndUpdateIfRowUnvalid(std::vector<int> prevInsertedLocations,std::vector<char> imageData,long long int &i)
 {
 
-    return;
     while ( std::find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end()) // todo add prvloc check
     {
         i = rand() % (imageData.size() / 2);
@@ -53,6 +52,8 @@ void embedValue(std::vector<char>& imageData, BMPHeader& header, const char* dat
         if(data[dataIndex] != '\0')
         {
             currentHexValue = getHexVal(nextIndex);
+            prevInsertedLocations.push_back(nextIndex);
+
             imageData.erase(imageData.begin() + index +1 , imageData.begin() + index +1+ currentHexValue.size() + NXT.size());
             imageData.insert(imageData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
             imageData.insert(imageData.begin() + index +1+ currentHexValue.size(), NXT.begin(), NXT.end());

@@ -10,7 +10,7 @@ int main(void)
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    const char* text = "Bana biat edeceksiniz ben mahmut ozer gozukirmiziyim";
+    const char* text = "This is a test data which means that this is a test";
     BMPHeader header;
     BMPHeader outputHeader;
 
