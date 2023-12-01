@@ -8,8 +8,9 @@ const char* outputPath = "../outputImage.bmp";
 
 int main(void)
 {
-    cout << sizeof(BMPHeader);
-    const char* text[] = { "Th", nullptr};
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+    const char* text = "Bana biat edeceksiniz ben mahmut ozer gozukirmiziyim";
     BMPHeader header;
     BMPHeader outputHeader;
 
@@ -39,7 +40,7 @@ int main(void)
     vector<char> outputFilePixelData(outputFilePixelDataSize);
 
     outputFileReadMode.read(outputFilePixelData.data(), inputFilePixelDataSize);
-    getEmbededDataFromOutputFile(outputHeader, outputFilePixelData);
+    getEmbodiedDataFromOutputFile(outputHeader, outputFilePixelData);
 
 
 

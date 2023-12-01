@@ -6,122 +6,104 @@
 using std::endl, std::cout,std::string,std::hex,std::vector;
 
 
-void checkAndUpdateIfRowUnvalid(std::vector<int> prevLocs,std::vector<char> imageData,int &i , int rowWidth)
+void checkAndUpdateIfRowUnvalid(std::vector<int> prevInsertedLocations,std::vector<char> imageData,long long int &i)
 {
-    int rowStart = (i / rowWidth) * rowWidth;
-    int rowEnd = rowStart + rowWidth - 1;
 
-    while ((i < rowStart || i > rowEnd) || std::find(prevLocs.begin(), prevLocs.end(), i) != prevLocs.end()) // todo add prvloc check
+    return;
+    while ( std::find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end()) // todo add prvloc check
     {
         i = rand() % (imageData.size() / 2);
-        rowStart = (i / rowWidth) * rowWidth;
-        rowEnd = rowStart + rowWidth - 1;
+       
     }
 }
-void embedValue(std::vector<char>& imageData, BMPHeader& header, const char** datas)
+string getHexVal(long long int number)
 {
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
-    std::vector<int> prevLocs;
+    std::stringstream _stringStream;
+    _stringStream << hex << number;
+
+    return _stringStream.str();
+}
+void embedValue(std::vector<char>& imageData, BMPHeader& header, const char* data)
+{
+    std::vector<int> prevInsertedLocations;
+    const std::vector<char> EOL({'E','O','L'});
+    const std::vector<char> NXT({'N','X','T'});
+    const std::vector<char> _EOF({'E','O','F'});
     std::string insertedLocationsHex;
-    int i;
-    int numRows = header.height;
-    int rowWidth = header.width;
+    string currentHexValue;
+    long long int index,nextIndex;
 
-    int dataIndex = 0;
 
-    for (int dataCounter = 0; datas[dataCounter] != nullptr; )
+    index = (std::rand() % (int)(imageData.size()));
+    checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, index);
+    currentHexValue = getHexVal(index);
+
+    strncpy_s(header.start,currentHexValue.c_str(), currentHexValue.size());
+
+    for ( int dataIndex = 0; data[dataIndex]!='\0'; )
     {
-         i = std::rand() % (imageData.size()/2);
-         checkAndUpdateIfRowUnvalid(prevLocs, imageData,i,rowWidth);
-
-
-        std::stringstream ss;
-        ss << hex << i;
-        insertedLocationsHex.append(ss.str());
-        insertedLocationsHex.append("NXT");
-
-        /*
-            #############################
-            Asagidaki satir veriyi kyouyor  
+        cout << index<<endl;
         
-            #############################
-            imageData[i] = datas[dataCounter][dataIndex];
-            datas[dataCounter][dataIndex] bu sifreli metin olacak
-        */
-        char a = (char)(datas[dataCounter][dataIndex]);
-        imageData[i] = a;
-        dataIndex++;
+        nextIndex = std::rand() % (int)(imageData.size());
+        checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, nextIndex);
+        imageData[index] = (char)(data[dataIndex++]);
 
         // Check for end of data
-        if (datas[dataCounter][dataIndex] == '\0')
+
+        if(data[dataIndex] != '\0')
         {
-            std::stringstream ss;
-            dataIndex = 0;
-            ss << hex << i;
-            insertedLocationsHex.append(ss.str());
-            insertedLocationsHex.append("EOL");
-            ++dataCounter;
+            currentHexValue = getHexVal(nextIndex);
+            imageData.erase(imageData.begin() + index +1 , imageData.begin() + index +1+ currentHexValue.size() + NXT.size());
+            imageData.insert(imageData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
+            imageData.insert(imageData.begin() + index +1+ currentHexValue.size(), NXT.begin(), NXT.end());
+
+            index = nextIndex;
+
+        }
+        else
+        {
+            imageData.erase(imageData.begin() + index + 1, imageData.begin() + index + 1 + _EOF.size());
+            imageData.insert(imageData.begin() + index + 1, _EOF.begin(), _EOF.end());
         }
 
-        prevLocs.push_back(i);
+
+        prevInsertedLocations.push_back(index);
     }
-
-    i = std::rand() % (imageData.size() / 2);
-
-    checkAndUpdateIfRowUnvalid(prevLocs,imageData,i,rowWidth);
-
-    std::stringstream ss;
-    ss << hex << i;
-    insertedLocationsHex.append(ss.str());
-    insertedLocationsHex.append("EOF");
-
-    int randomInsertPos = rand() % ((imageData.size()/2));
-
-    checkAndUpdateIfRowUnvalid(prevLocs, imageData, randomInsertPos, rowWidth);
-    strncpy_s(header.start, std::to_string(randomInsertPos).c_str(), std::to_string(randomInsertPos).size());
-    cout << "Embedded data Inserted at Index  " << header.start<<endl;
-
-    // Erase the existing elements at the random position and insert the entire string
-    imageData.erase(imageData.begin() + randomInsertPos, imageData.begin() + randomInsertPos + insertedLocationsHex.size());
-    imageData.insert(imageData.begin() + randomInsertPos, insertedLocationsHex.begin(), insertedLocationsHex.end());
-
-    // Update BMPHeader sizes
     header.fileSize = sizeof(BMPHeader) + imageData.size();
     header.imageSize = imageData.size() ;
 }
-void getEmbededDataFromOutputFile(BMPHeader& header, std::vector<char>& pixelData)
+void getEmbodiedDataFromOutputFile(BMPHeader& header, std::vector<char>& pixelData)
 {
     std::string insertedLocationsHex;
-    std::vector<char> rawData;
-    unsigned long long  insertedLocationsInt;
+    std::vector<char> unraveledData;
+    int nextIndex;
 
 
-    for (unsigned long long i = std::stoi(header.start); i < pixelData.size(); ++i)
+    for (unsigned long long i = std::stoi(header.start,0,sizeof(header.start)); i < pixelData.size(); )
     {
         insertedLocationsHex.append(1, pixelData[i]);
         if (insertedLocationsHex.find("EOF") != std::string::npos)
         {
+            unraveledData.push_back((insertedLocationsHex[0]));
+
             break;
 
-        }
-
-        if (insertedLocationsHex.find("EOL") != std::string::npos)
+        }else if (insertedLocationsHex.find("NXT") != std::string::npos)
         {
-            rawData.push_back(' ');
+            nextIndex = (stoi(insertedLocationsHex.substr(1, insertedLocationsHex.size() - 3), nullptr, 16));
+            int c = insertedLocationsHex.size();
+            unraveledData.push_back((insertedLocationsHex[0]));
             insertedLocationsHex.clear();
-        }
+            i = nextIndex;
 
-        if (insertedLocationsHex.find("NXT") != std::string::npos)
-        {
-
-            insertedLocationsInt = (stoi(insertedLocationsHex.substr(0, insertedLocationsHex.size() - 3), nullptr, 16));
-            insertedLocationsHex.clear();
-            cout << "Reading data at " << insertedLocationsInt << " " <<pixelData[insertedLocationsInt] << endl;
-            rawData.push_back((pixelData[insertedLocationsInt]));
         }
+        else
+            ++i;
 
     }
 
-    for (auto c : rawData)
+    for (auto c : unraveledData) 
         cout << c;
+
+
 }
