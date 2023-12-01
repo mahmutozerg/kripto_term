@@ -2,6 +2,7 @@
 #include <sstream>
 #include <algorithm>
 #include "FileOperations.h"
+#include "Utils.h"
 #include "BMP.h"
 using std::endl, std::cout,std::string,std::hex,std::vector;
 
@@ -14,13 +15,6 @@ void checkAndUpdateIfRowUnvalid(std::vector<int> prevInsertedLocations,std::vect
         i = rand() % (imageData.size() / 2);
        
     }
-}
-string getHexVal(long long int number)
-{
-    std::stringstream _stringStream;
-    _stringStream << hex << number;
-
-    return _stringStream.str();
 }
 void embedValue(std::vector<char>& imageData, BMPHeader& header, const char* data)
 {
@@ -100,7 +94,6 @@ void getEmbodiedDataFromOutputFile(BMPHeader& header, std::vector<char>& pixelDa
         }
         else
             ++i;
-
     }
 
     for (auto c : unraveledData) 
