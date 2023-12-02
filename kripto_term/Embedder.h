@@ -39,24 +39,15 @@ void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* dat
 
         // Check for end of data
 
-        if(data[dataIndex] != '\0')
-        {
-            currentHexValue = getHexVal(nextIndex);
-            prevInsertedLocations.push_back(nextIndex);
+        currentHexValue = getHexVal(nextIndex);
+        prevInsertedLocations.push_back(nextIndex);
 
-            imagePixelData.erase(imagePixelData.begin() + index +1 , imagePixelData.begin() + index +1+ currentHexValue.size() );
-            imagePixelData.insert(imagePixelData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
-            imagePixelData[index + 1 + currentHexValue.size()] = endOfDataKey;
+        imagePixelData.erase(imagePixelData.begin() + index +1 , imagePixelData.begin() + index +1+ currentHexValue.size() );
+        imagePixelData.insert(imagePixelData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
+        imagePixelData[index + 1 + currentHexValue.size()] = endOfDataKey;
 
-            index = nextIndex;
+        index = nextIndex;
 
-        }
-        else
-        {
-
-            imagePixelData[index + 1 ] = endOfDataKey;
-            index = nextIndex;
-        }
 
 
         prevInsertedLocations.push_back(index);
@@ -80,20 +71,24 @@ void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelDa
     for (unsigned long long i = stoi(header.start,0,sizeof(header.start)); i < imagePixelData.size(); )
     {
         insertedLocationsHex.append(1, imagePixelData[i]);
-        if (insertedLocationsHex.find(endOfDataKey) != string::npos && insertedLocationsHex.length()==2)
-        {
-            unraveledData.push_back((insertedLocationsHex[0]));
-            break;
 
-        }
-        else if (insertedLocationsHex.find(endOfDataKey) != string::npos && insertedLocationsHex.length()==hexSizeUpperBound)
+        if (insertedLocationsHex.find(endOfDataKey) != string::npos && insertedLocationsHex.length()==hexSizeUpperBound)
         {
-            unraveledData.push_back((insertedLocationsHex[0]));
-            insertedLocationsHex.erase(insertedLocationsHex.begin());
-            nextIndex = (stoi(insertedLocationsHex, nullptr, 16));
-            int c = insertedLocationsHex.size();
-            insertedLocationsHex.clear();
-            i = nextIndex;
+            try
+            {
+                unraveledData.push_back((insertedLocationsHex[0]));
+                insertedLocationsHex.erase(insertedLocationsHex.begin());
+                nextIndex = (stoi(insertedLocationsHex, nullptr, 16));
+                int c = insertedLocationsHex.size();
+                insertedLocationsHex.clear();
+                i = nextIndex;
+
+            }
+            catch (...)
+            {
+                break;
+            }
+
 
         }
         else
