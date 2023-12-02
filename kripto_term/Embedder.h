@@ -7,18 +7,20 @@
 using std::endl, std::cout,std::string,std::hex,std::vector,std::find,std::rand,std::stoi;
 
 
-void checkAndUpdateIfRowUnvalid(vector<int> prevInsertedLocations,vector<char> imageData,long long int &i)
+void checkAndUpdateIfRowUnvalid(vector<long long int> prevInsertedLocations,vector<char> imageData,long long int &i)
 {
 
-    while (find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end()) // todo add prvloc check
+    while (find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end())
     {
-        i = rand() % (imageData.size() / 2);
+        i = static_cast<long long int>(rand() % (imageData.size() -1));
        
     }
 }
+
+
 void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
 {
-    vector<int> prevInsertedLocations;
+    vector<long long int> prevInsertedLocations;
     const vector<char> EOL({'E','O','L'});
     const vector<char> NXT({'N','X','T'});
     const vector<char> _EOF({'E','O','F'});
@@ -35,7 +37,6 @@ void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
 
     for ( int dataIndex = 0; data[dataIndex]!='\0'; )
     {
-        cout << index<<endl;
         
         nextIndex = rand() % (int)(imageData.size());
         checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, nextIndex);
@@ -67,6 +68,12 @@ void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
     header.fileSize = sizeof(BMPHeader) + imageData.size();
     header.imageSize = imageData.size() ;
 }
+
+
+
+
+
+
 void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& pixelData)
 {
     string insertedLocationsHex;
