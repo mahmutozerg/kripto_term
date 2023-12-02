@@ -5,42 +5,38 @@
 #include "Utils.h"
 #include "BMP.h"
 using std::endl, std::cout,std::string,std::hex,std::vector,std::find,std::rand,std::stoi;
+char endKey = '/';
 
+void checkAndUpdateIfRowUnvalid(std::vector<long long int>& prevInsertedLocations, std::vector<char>& imagePixelData, long long int& i) {
+    // Seed for random number generation
+    int hexSizeUpperBound = getHexVal(imagePixelData.size()).size() + 1;
 
-void checkAndUpdateIfRowUnvalid(vector<long long int> prevInsertedLocations,vector<char> imageData,long long int &i)
-{
-
-    while (find(prevInsertedLocations.begin(), prevInsertedLocations.end(), i) != prevInsertedLocations.end())
+    while (std::any_of(prevInsertedLocations.begin(), prevInsertedLocations.end(),
+        [&](long long int x) { return x >= i && x <= (i + hexSizeUpperBound); }))
     {
-        i = static_cast<long long int>(rand() % (imageData.size() -1));
-       
+        i = std::rand() % (imagePixelData.size());
     }
 }
 
-
-void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
+void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* data)
 {
     vector<long long int> prevInsertedLocations;
-    const vector<char> EOL({'E','O','L'});
-    const vector<char> NXT({'N','X','T'});
-    const vector<char> _EOF({'E','O','F'});
     string insertedLocationsHex;
     string currentHexValue;
     long long int index,nextIndex;
 
 
-    index = (rand() % (int)(imageData.size()));
-    checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, index);
+    index = (rand() % (int)(imagePixelData.size()));
+    checkAndUpdateIfRowUnvalid(prevInsertedLocations, imagePixelData, index);
     currentHexValue = getHexVal(index);
 
     strncpy_s(header.start,currentHexValue.c_str(), currentHexValue.size());
 
     for ( int dataIndex = 0; data[dataIndex]!='\0'; )
     {
-        
-        nextIndex = rand() % (int)(imageData.size());
-        checkAndUpdateIfRowUnvalid(prevInsertedLocations, imageData, nextIndex);
-        imageData[index] = (char)(data[dataIndex++]);
+        nextIndex = rand() % (int)(imagePixelData.size());
+        checkAndUpdateIfRowUnvalid(prevInsertedLocations, imagePixelData, nextIndex);
+        imagePixelData[index] = (char)(data[dataIndex++]);
 
         // Check for end of data
 
@@ -49,24 +45,26 @@ void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
             currentHexValue = getHexVal(nextIndex);
             prevInsertedLocations.push_back(nextIndex);
 
-            imageData.erase(imageData.begin() + index +1 , imageData.begin() + index +1+ currentHexValue.size() + NXT.size());
-            imageData.insert(imageData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
-            imageData.insert(imageData.begin() + index +1+ currentHexValue.size(), NXT.begin(), NXT.end());
+            imagePixelData.erase(imagePixelData.begin() + index +1 , imagePixelData.begin() + index +1+ currentHexValue.size() );
+            imagePixelData.insert(imagePixelData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
+            imagePixelData[index + 1 + currentHexValue.size()] = '*';
 
             index = nextIndex;
 
         }
         else
         {
-            imageData.erase(imageData.begin() + index + 1, imageData.begin() + index + 1 + _EOF.size());
-            imageData.insert(imageData.begin() + index + 1, _EOF.begin(), _EOF.end());
+            imagePixelData.erase(imagePixelData.begin() + index + 1, imagePixelData.begin() + index + 1 + currentHexValue.size());
+            imagePixelData.insert(imagePixelData.begin() + index + 1, currentHexValue.begin(), currentHexValue.end());
+            imagePixelData[index + 1 + currentHexValue.size()] = endKey;
+            index = nextIndex;
         }
 
 
         prevInsertedLocations.push_back(index);
     }
-    header.fileSize = sizeof(BMPHeader) + imageData.size();
-    header.imageSize = imageData.size() ;
+    header.fileSize = sizeof(BMPHeader) + imagePixelData.size();
+    header.imageSize = imagePixelData.size() ;
 }
 
 
@@ -74,27 +72,29 @@ void embedValue(vector<char>& imageData, BMPHeader& header, const char* data)
 
 
 
-void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& pixelData)
+void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelData)
 {
     string insertedLocationsHex;
     vector<char> unraveledData;
     int nextIndex;
+    int hexSizeUpperBound = getHexVal(imagePixelData.size()).size() + 1;
 
-
-    for (unsigned long long i = stoi(header.start,0,sizeof(header.start)); i < pixelData.size(); )
+    for (unsigned long long i = stoi(header.start,0,sizeof(header.start)); i < imagePixelData.size(); )
     {
-        insertedLocationsHex.append(1, pixelData[i]);
-        if (insertedLocationsHex.find("EOF") != string::npos)
+        insertedLocationsHex.append(1, imagePixelData[i]);
+        if (insertedLocationsHex.find(endKey) != string::npos)
         {
             unraveledData.push_back((insertedLocationsHex[0]));
 
             break;
 
-        }else if (insertedLocationsHex.find("NXT") != string::npos)
+        }
+        else if (insertedLocationsHex.find('*') != string::npos && insertedLocationsHex.length()<=hexSizeUpperBound)
         {
-            nextIndex = (stoi(insertedLocationsHex.substr(1, insertedLocationsHex.size() - 3), nullptr, 16));
-            int c = insertedLocationsHex.size();
             unraveledData.push_back((insertedLocationsHex[0]));
+            insertedLocationsHex.erase(insertedLocationsHex.begin());
+            nextIndex = (stoi(insertedLocationsHex, nullptr, 16));
+            int c = insertedLocationsHex.size();
             insertedLocationsHex.clear();
             i = nextIndex;
 

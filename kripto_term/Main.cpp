@@ -3,14 +3,14 @@
 
 using std::ofstream,std::ifstream, std::srand,std::time;
 
-const char* inputFilePath = "../test.bmp";
-const char* outputPath = "../outputImage.bmp";
+const char* inputFilePath = "../inputImage.bmp";
+const char* outputPath = "../outputImage2.bmp";
 int main(void)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
     const char* key = generateRandomChar();
 
-    const char* text = "This is a test data which means that this is a test";
+    const char* text = "Mahmut Ozer Gozukirmizi 1234657986";
     BMPHeader header;
     BMPHeader outputHeader;
 
