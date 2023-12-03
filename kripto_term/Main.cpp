@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include"Embedder.h"
 
 using std::ofstream,std::ifstream, std::srand,std::time;
@@ -10,7 +10,7 @@ int main(void)
     srand(static_cast<unsigned int>(time(nullptr)));
     const char* key = generateRandomChar();
 
-    const char* text = "Mah mut um 1 2 3 4 ";
+    string text = "MahmutOzerqwertyuiopasdfghjklzxcvbnm12346578910MahmutOzerGozukirmiziMahmutOzerqwertyuiopasdfghjklzxcvbnm12346578910MahmutOzerGozukirmizi";
     BMPHeader header;
     BMPHeader outputHeader;
 
@@ -26,7 +26,7 @@ int main(void)
     inputFile.read(inputFilePixelData.data(), inputFilePixelDataSize);
     inputFile.close();
 
-    embedValue(inputFilePixelData, header, text);
+    embedValue(inputFilePixelData, header, text.c_str());
 
     outputFile.write(reinterpret_cast<char*>(&header), sizeof(BMPHeader));
     outputFile.write(inputFilePixelData.data(), inputFilePixelData.size());
