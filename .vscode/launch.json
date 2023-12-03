@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Cagatay/Documents/GitHub/kripto_term/kripto_term",
-      "program": "c:/Users/Cagatay/Documents/GitHub/kripto_term/kripto_term/build/Debug/outDebug",
+      "cwd": "c:/Users/Cagatay/Documents/GitHub/kripto_term/playfairCipher",
+      "program": "c:/Users/Cagatay/Documents/GitHub/kripto_term/kripto_term/playfairCipher/x64/playfairCipher",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
