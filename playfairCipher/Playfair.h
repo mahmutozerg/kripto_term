@@ -5,8 +5,6 @@
 #include <cstdlib>
 #include <vector>
 
-#define SIZE 30
-
 using namespace std;
 
 // Convert all the characters to lowercase
@@ -126,7 +124,8 @@ void decrypt(char str[], char keyT[5][5], int ps)
 // Function to call decrypt
 void decryptByPlayfairCipher(char str[], char key[])
 {
-	char ps, ks, keyT[5][5];
+	int ps, ks;
+	char keyT[5][5];
 
 	// Key
 	ks = strlen(key);
@@ -179,7 +178,8 @@ void encrypt(char str[], char keyT[5][5], int ps)
 // Function to encrypt using Playfair Cipher
 void encryptByPlayfairCipher(char str[], char key[])
 {
-	char ps, ks, keyT[5][5];
+	int ps, ks;
+	char keyT[5][5];
 
 	// Key
 	ks = strlen(key);

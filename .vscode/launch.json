@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "c:/Users/Cagatay/Documents/GitHub/kripto_term/playfairCipher",
-      "program": "c:/Users/Cagatay/Documents/GitHub/kripto_term/playfairCipher/x64/Debug/playfairCipher.exe",
+      "program": "c:/Users/Cagatay/Documents/GitHub/kripto_term/playfairCipher/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
