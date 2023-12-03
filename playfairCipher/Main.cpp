@@ -5,18 +5,16 @@
 
 using namespace std;
 
-
-// Driver code
 int main()
 {
     char str[SIZE], key[SIZE];
 
-    // Key to be encrypted
-    strcpy(key, "Monarchy");
+    // Key used in encryption
+    strcpy(key, "Crypto");
     cout << "Key Text: " << key << endl;
 
     // Plain text
-    strcpy(str, "cagatay kahraman");
+    strcpy(str, "This is an example text that is used for the purpose of testing the playfair cipher implemented for the cryptography term project");
     cout << "Plain text: " << str << endl;
 
     // Encrypt using Playfair Cipher
