@@ -10,7 +10,7 @@ int main(void)
     srand(static_cast<unsigned int>(time(nullptr)));
     const char* key = generateRandomChar();
 
-    const char* text = "Mah mut um";
+    const char* text = "Mah mut um 1 2 3 4 ";
     BMPHeader header;
     BMPHeader outputHeader;
 

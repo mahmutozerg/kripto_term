@@ -21,36 +21,36 @@ void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* dat
 {
     vector<long long int> prevInsertedLocations;
     string insertedLocationsHex;
-    string currentHexValue;
+    string nextHexValue;
     long long int index,nextIndex;
 
 
     index = (rand() % (int)(imagePixelData.size()));
     checkAndUpdateIfRowInvalid(prevInsertedLocations, imagePixelData, index);
-    currentHexValue = getHexVal(index);
+    nextHexValue = getHexVal(index);
+    prevInsertedLocations.push_back(index);
 
-    strncpy_s(header.start,currentHexValue.c_str(), currentHexValue.size());
+    strncpy_s(header.start,nextHexValue.c_str(), nextHexValue.size());
 
     for ( int dataIndex = 0; data[dataIndex]!='\0'; )
     {
-        nextIndex = rand() % (int)(imagePixelData.size());
-        checkAndUpdateIfRowInvalid(prevInsertedLocations, imagePixelData, nextIndex);
+
         imagePixelData[index] = (char)(data[dataIndex++]);
 
-        // Check for end of data
+        nextIndex = rand() % (int)(imagePixelData.size());
+        checkAndUpdateIfRowInvalid(prevInsertedLocations, imagePixelData, nextIndex);
 
-        currentHexValue = getHexVal(nextIndex);
+        nextHexValue = getHexVal(nextIndex);
         prevInsertedLocations.push_back(nextIndex);
 
-        imagePixelData.erase(imagePixelData.begin() + index +1 , imagePixelData.begin() + index +1+ currentHexValue.size() );
-        imagePixelData.insert(imagePixelData.begin() + index +1 , currentHexValue.begin(), currentHexValue.end());
-        imagePixelData[index + 1 + currentHexValue.size()] = endOfDataKey;
+        imagePixelData.erase(imagePixelData.begin() + index +1 , imagePixelData.begin() + index +1+ nextHexValue.size() );
+        imagePixelData.insert(imagePixelData.begin() + index +1 , nextHexValue.begin(), nextHexValue.end());
+        imagePixelData[index + 1 + nextHexValue.size()] = endOfDataKey;
 
         index = nextIndex;
 
 
 
-        prevInsertedLocations.push_back(index);
     }
     header.fileSize = sizeof(BMPHeader) + imagePixelData.size();
     header.imageSize = imagePixelData.size() ;
