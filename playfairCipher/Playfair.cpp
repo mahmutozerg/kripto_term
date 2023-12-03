@@ -1,28 +1,38 @@
 #include <iostream>
 #include "Playfair.h"
-
-#define SIZE 30
+#include <string>
 
 using namespace std;
 
+#define SIZE 30
+
 int main()
 {
-    char str[SIZE], key[SIZE];
+    char key[SIZE];
+    char* str;
+    string plaintext;
 
-    // Key used in encryption
+    // New key to be encrypted
     strcpy(key, "Crypto");
     cout << "Key Text: " << key << endl;
 
     // Plain text
-    strcpy(str, "This is an example text that is used for the purpose of testing the playfair cipher implemented for the cryptography term project");
-    cout << "Plain text: " << str << endl;
+    plaintext = "This is an example plaintext created for the purpose of testing the playfair cipher used in the term project of the cryptography";
+    cout << "Plain text: " << plaintext << endl;
+
+    str = new char[plaintext.length() + 1];
+    strcpy(str, plaintext.c_str());
 
     // Encrypt using Playfair Cipher
     encryptByPlayfairCipher(str, key);
     cout << "Cipher text: " << str << endl;
 
+    // Convert cipher text to ASCII values and print them
     vector<int> asciiValues = cipherTextToAsciiValues(str);
     printAsciiValues(asciiValues);
 
+    delete[] str;
+
     return 0;
 }
+
