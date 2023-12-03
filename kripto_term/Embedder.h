@@ -4,39 +4,20 @@
 #include "FileOperations.h"
 #include "Utils.h"
 #include "BMP.h"
-#include <set>
-#include <random>  // for random number generation
 
-using std::endl, std::cout,std::string,std::hex,std::vector,std::find,std::stoi,std::random_device,std::mt19937,std::uniform_int_distribution,std::set;
+using std::endl, std::cout,std::string,std::hex,std::vector,std::find,std::stoi;
 const char endOfDataKey = ' ';
 
-void checkAndUpdateIfRowInvalid(std::set<long long int>& prevInsertedLocations, int imagePixelDataSize, long long int& i) {
-    int hexSizeUpperBound = getHexVal(imagePixelDataSize).size() + 1;
 
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<long long int> distribution(0, imagePixelDataSize - 1);
-
-    for (const long long int& location : prevInsertedLocations) {
-        // Ensure i is at least 8 units away from each element in prevInsertedLocations
-        while (abs(i - location) < 8) {
-            i = distribution(gen);  // Generate a new random value for i
-        }
-    }
-}
 void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* data)
 {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<long long int> distribution(0, imagePixelData.size() - 1);
 
     set<long long int> prevInsertedLocations;
     string insertedLocationsHex;
     string nextHexValue;
     long long int index,nextIndex;
 
-
-    index = distribution(gen);
+    setRandomNumber(index,imagePixelData.size());
     checkAndUpdateIfRowInvalid(prevInsertedLocations, imagePixelData.size(), index);
     nextHexValue = getHexVal(index);
     prevInsertedLocations.insert(index);
@@ -48,15 +29,13 @@ void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* dat
 
         imagePixelData[index] = (char)(data[dataIndex++]);
 
-        nextIndex = distribution(gen);
+        setRandomNumber(nextIndex, imagePixelData.size());
         checkAndUpdateIfRowInvalid(prevInsertedLocations, imagePixelData.size(), nextIndex);
         prevInsertedLocations.insert(nextIndex);
 
         nextHexValue = getHexVal(nextIndex);
-        for (int i = index + 1,j=0; i < index + 1 + nextHexValue.length(); ++i,++j)
-        {
-            imagePixelData[i] = nextHexValue[j];
-        }
+        imagePixelData.erase(imagePixelData.begin() + index + 1, imagePixelData.begin() + index + 1 + nextHexValue.length());
+        imagePixelData.insert(imagePixelData.begin() + index + 1, nextHexValue.begin(), nextHexValue.end());
         imagePixelData[index + 1 + nextHexValue.length()] = endOfDataKey;
 
         index = nextIndex;
@@ -67,11 +46,6 @@ void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* dat
     header.fileSize = sizeof(BMPHeader) + imagePixelData.size();
     header.imageSize = imagePixelData.size() ;
 }
-
-
-
-
-
 
 void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelData)
 {
@@ -86,32 +60,22 @@ void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelDa
 
         if (insertedLocationsHex.find(endOfDataKey) != string::npos && insertedLocationsHex.length()>=hexSizeUpperBound)
         {
-            try
-            {
-                unraveledData.push_back((insertedLocationsHex[0]));
-                insertedLocationsHex.erase(insertedLocationsHex.begin());
-                nextIndex = (stoi(insertedLocationsHex, nullptr, 16));
-                int c = insertedLocationsHex.size();
-                insertedLocationsHex.clear();
-                i = nextIndex;
 
-            }
-            catch (...)
-            {
-                break;
-            }
-
+            unraveledData.push_back((insertedLocationsHex[0]));
+            insertedLocationsHex.erase(insertedLocationsHex.begin());
+            nextIndex = (stoi(insertedLocationsHex, nullptr, 16));
+            int c = insertedLocationsHex.size();
+            insertedLocationsHex.clear();
+            i = nextIndex;
 
         }
         else if (insertedLocationsHex.length() > hexSizeUpperBound)
-        {
             break;
-        }else
+        else
             ++i;
     }
 
     for (auto c : unraveledData) 
         cout << c;
 
-    imagePixelData[12121] = 1;
 }
