@@ -158,6 +158,7 @@ int newPrepare(char*& str) {
 
 	for (size_t i = 0; i + 1 < tempStr.length(); i += 2) {
 		// Avoid infinite loop by not inserting 'x' between two 'x's
+		// Append bogus letter between pairs that include the same letter
 		if (tempStr[i] == tempStr[i + 1] && tempStr[i] != 'x') {
 			tempStr.insert(i + 1, "x");
 		}

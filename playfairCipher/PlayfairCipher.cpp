@@ -31,6 +31,10 @@ int main()
     vector<int> asciiValues = cipherTextToAsciiValues(str);
     printAsciiValues(asciiValues);
 
+     // Decipher back to plaintext
+    decryptByPlayfairCipher(str, key);
+    cout << endl << "Deciphered text: " << str << endl;
+
     delete[] str;
 
     return 0;
