@@ -4,12 +4,13 @@
 #include "FileOperations.h"
 #include "Utils.h"
 #include "BMP.h"
-
+#include "Xor.h"
+#include "Playfair.h"
 using std::endl, std::cout,std::string,std::hex,std::vector,std::find,std::stoi;
 const char endOfDataKey = ' ';
 
 
-void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* data)
+void embedValue(vector<char>& imagePixelData, BMPHeader& header, string data)
 {
 
     set<long long int> prevInsertedLocations;
@@ -24,11 +25,9 @@ void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* dat
 
     strncpy_s(header.start,nextHexValue.c_str(), nextHexValue.length());
 
-    for ( int dataIndex = 0; data[dataIndex]!='\0'; )
+    for ( int dataIndex = 0; dataIndex < data.length(); )
     {
-
         imagePixelData[index] = (char)(data[dataIndex++]);
-
         setRandomNumber(nextIndex, imagePixelData.size());
         checkAndUpdateIfRowInvalid(prevInsertedLocations, imagePixelData.size(), nextIndex);
         prevInsertedLocations.insert(nextIndex);
@@ -47,10 +46,10 @@ void embedValue(vector<char>& imagePixelData, BMPHeader& header, const char* dat
     header.imageSize = imagePixelData.size() ;
 }
 
-void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelData)
+string getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelData)
 {
     string insertedLocationsHex;
-    vector<char> unraveledData;
+    string unraveledData;
     int nextIndex;
     int hexSizeUpperBound = getHexVal(imagePixelData.size()).size() + 1;
 
@@ -75,7 +74,6 @@ void getEmbodiedDataFromOutputFile(BMPHeader& header, vector<char>& imagePixelDa
             ++i;
     }
 
-    for (auto c : unraveledData) 
-        cout << c;
+    return unraveledData;
 
 }

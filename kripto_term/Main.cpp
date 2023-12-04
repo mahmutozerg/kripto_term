@@ -1,4 +1,6 @@
-﻿#include <iostream>
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+#include <iostream>
 #include"Embedder.h"
 
 using std::ofstream,std::ifstream, std::srand,std::time;
@@ -7,10 +9,21 @@ const char* inputFilePath = "../inputImage.bmp";
 const char* outputPath = "../outputImage2.bmp";
 int main(void)
 {
-    srand(static_cast<unsigned int>(time(nullptr)));
-    const char* key = generateRandomChar();
+    string nameSurname = "MahmutUmurCagatayKriptoTermProjectPhase1Male";
+    string ssn = "202312045";
+    char keyForPlayFair[] = "TermProject";
+    char* str;
+  
 
-    string text = "MahmutOzerqwertyuiopasdfghjklzxcvbnm12346578910MahmutOzerGozukirmiziMahmutOzerqwertyuiopasdfghjklzxcvbnm12346578910MahmutOzerGozukirmizi";
+    string key = generateSecureKey(ssn.length());
+
+    str = new char[2 * nameSurname.length() + 1];
+    strcpy(str, nameSurname.c_str());
+    encryptByPlayfairCipher(str, keyForPlayFair);
+    xorEncryptDecrypt(ssn, key);
+    string full = str;
+    full.push_back(' ');
+    full = full + ssn;
     BMPHeader header;
     BMPHeader outputHeader;
 
@@ -26,7 +39,7 @@ int main(void)
     inputFile.read(inputFilePixelData.data(), inputFilePixelDataSize);
     inputFile.close();
 
-    embedValue(inputFilePixelData, header, text.c_str());
+    embedValue(inputFilePixelData, header, full);
 
     outputFile.write(reinterpret_cast<char*>(&header), sizeof(BMPHeader));
     outputFile.write(inputFilePixelData.data(), inputFilePixelData.size());
@@ -40,12 +53,18 @@ int main(void)
     vector<char> outputFilePixelData(outputFilePixelDataSize);
 
     outputFileReadMode.read(outputFilePixelData.data(), inputFilePixelDataSize);
-    getEmbodiedDataFromOutputFile(outputHeader, outputFilePixelData);
-
-
-
+    string unravaled = getEmbodiedDataFromOutputFile(outputHeader, outputFilePixelData);
     outputFileReadMode.close();
 
+    delete[]str;
+    str = new char[2 * unravaled.length() + 1];
+    strcpy(str, unravaled.substr(0,unravaled.find_first_of(' ')).c_str());
+
+    decryptByPlayfairCipher(str,keyForPlayFair);
+    string decryptedSsn = unravaled.substr(unravaled.find_first_of(' ') + 1, unravaled.length());
+   xorEncryptDecrypt(decryptedSsn, key);
+
+    cout << "Unraveled data " << str << " " << decryptedSsn;
     
     return 0;
 }
