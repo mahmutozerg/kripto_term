@@ -1,15 +1,16 @@
 #include <iostream>
 #include"Embedder.h"
 
-using namespace std;
+using std::ofstream,std::ifstream, std::srand,std::time;
 
 const char* inputFilePath = "../inputImage.bmp";
-const char* outputPath = "../outputImage.bmp";
-
+const char* outputPath = "../outputImage2.bmp";
 int main(void)
 {
+    srand(static_cast<unsigned int>(time(nullptr)));
+    const char* key = generateRandomChar();
 
-    const char* text[] = { "This is a ","Test Data","12345678910", nullptr};
+    const char* text = "Mah mut um";
     BMPHeader header;
     BMPHeader outputHeader;
 
@@ -23,6 +24,7 @@ int main(void)
 
     vector<char> inputFilePixelData(inputFilePixelDataSize);
     inputFile.read(inputFilePixelData.data(), inputFilePixelDataSize);
+    inputFile.close();
 
     embedValue(inputFilePixelData, header, text);
 
@@ -31,8 +33,18 @@ int main(void)
 
     outputFile.close();
 
-    vector<char> outputFilePixelData;
-    getEmbededDataFromOutputFile(outputHeader, outputFilePixelData, outputPath);
+    ifstream outputFileReadMode = openInputFile(outputPath);
+    outputFileReadMode.read(reinterpret_cast<char*>(&outputHeader), sizeof(BMPHeader));
+
+    size_t outputFilePixelDataSize = outputHeader.fileSize - sizeof(BMPHeader);
+    vector<char> outputFilePixelData(outputFilePixelDataSize);
+
+    outputFileReadMode.read(outputFilePixelData.data(), inputFilePixelDataSize);
+    getEmbodiedDataFromOutputFile(outputHeader, outputFilePixelData);
+
+
+
+    outputFileReadMode.close();
 
     
     return 0;
