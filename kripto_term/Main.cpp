@@ -5,7 +5,7 @@
 
 using std::ofstream,std::ifstream, std::srand,std::time;
 
-const char* inputFilePath = "../inputImage.bmp";
+const char* inputFilePath = "../hailmary.bmp";
 const char* outputPath = "../outputImage2.bmp";
 int main(void)
 {
@@ -46,6 +46,7 @@ int main(void)
 
     outputFile.close();
 
+    /*
     ifstream outputFileReadMode = openInputFile(outputPath);
     outputFileReadMode.read(reinterpret_cast<char*>(&outputHeader), sizeof(BMPHeader));
 
@@ -53,18 +54,19 @@ int main(void)
     vector<char> outputFilePixelData(outputFilePixelDataSize);
 
     outputFileReadMode.read(outputFilePixelData.data(), inputFilePixelDataSize);
-    string unravaled = getEmbodiedDataFromOutputFile(outputHeader, outputFilePixelData);
+    string unraveled = getEmbodiedDataFromOutputFile(outputHeader, outputFilePixelData);
     outputFileReadMode.close();
 
     delete[]str;
-    str = new char[2 * unravaled.length() + 1];
-    strcpy(str, unravaled.substr(0,unravaled.find_first_of(' ')).c_str());
+    str = new char[2 * unraveled.length() + 1];
+    strcpy(str, unraveled.substr(0,unraveled.find_first_of(' ')).c_str());
 
     decryptByPlayfairCipher(str,keyForPlayFair);
-    string decryptedSsn = unravaled.substr(unravaled.find_first_of(' ') + 1, unravaled.length());
-   xorEncryptDecrypt(decryptedSsn, key);
+    string decryptedSsn = unraveled.substr(unraveled.find_first_of(' ') + 1, unraveled.length());
+    xorEncryptDecrypt(decryptedSsn, key);
 
     cout << "Unraveled data " << str << " " << decryptedSsn;
-    
+    */
     return 0;
-}
+}    
+

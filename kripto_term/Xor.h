@@ -8,14 +8,15 @@ using namespace std;
 
 // Function to generate a secure key
 string generateSecureKey(size_t length) {
-    random_device rd;  // Cryptographically secure pseudo-random number generator
-    uniform_int_distribution<int> dist(48, 57);
+    long long int currentKey;
 
     string key;
     key.reserve(length);
 
-    for (size_t i = 0; i < length; ++i) {
-        key.push_back(static_cast<char>(dist(rd)));
+    for (size_t i = 0; i < length; ++i) 
+    {
+        setRandomNumber(currentKey,57,48);
+        key.push_back(static_cast<char>(currentKey));
     }
 
     return key;

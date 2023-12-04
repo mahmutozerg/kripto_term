@@ -34,7 +34,7 @@ const char * generateRandomChar()
 
 }
 
-void setRandomNumber(long long int& number, long long int maxNumber)
+void setRandomNumber(long long int& number, long long int maxNumber, long long int min_number = 0 )
 {
     /*
     
@@ -42,7 +42,7 @@ void setRandomNumber(long long int& number, long long int maxNumber)
     */
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<long long int> distribution(0, maxNumber - 1);
+    uniform_int_distribution<long long int> distribution(min_number, maxNumber );
     number = distribution(gen);
 }
 void checkAndUpdateIfRowInvalid(std::set<long long int>& prevInsertedLocations, int imagePixelDataSize, long long int& i) {
