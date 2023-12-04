@@ -142,6 +142,7 @@ void decryptByPlayfairCipher(char str[], char key[])
 	decrypt(str, keyT, ps);
 }
 
+/*
 int prepare(char str[], int ptrs)
 {
 	if (ptrs % 2 != 0) {
@@ -150,6 +151,29 @@ int prepare(char str[], int ptrs)
 	}
 	return ptrs;
 }
+*/
+
+int newPrepare(char*& str) {
+	string tempStr(str);
+
+	for (size_t i = 0; i + 1 < tempStr.length(); i += 2) {
+		// Avoid infinite loop by not inserting 'x' between two 'x's
+		if (tempStr[i] == tempStr[i + 1] && tempStr[i] != 'x') {
+			tempStr.insert(i + 1, "x");
+		}
+	}
+
+	if (tempStr.length() % 2 != 0) {
+		tempStr += 'z'; // Append bogus letter
+	}
+
+	delete[] str;
+	str = new char[tempStr.length() + 1];
+	strcpy(str, tempStr.c_str());
+
+	return tempStr.length();
+}
+
 
 // Function for performing the encryption
 void encrypt(char str[], char keyT[5][5], int ps)
@@ -191,8 +215,17 @@ void encryptByPlayfairCipher(char str[], char key[])
 	toLowerCase(str, ps);
 	ps = removeSpaces(str, ps);
 
-	ps = prepare(str, ps);
+	char* tempStr = new char[2 * strlen(str) + 1];
+	strcpy(tempStr, str);
 
+	// Prepare plaintext
+	ps = newPrepare(tempStr);
+
+	strcpy(str, tempStr); // Copy the prepared string back to str
+
+	// Free the temporary string
+	delete[] tempStr;
+	
 	generateKeyTable(key, ks, keyT);
 
 	encrypt(str, keyT, ps);
@@ -211,6 +244,6 @@ vector<int> cipherTextToAsciiValues(const string& str) {
 
 void printAsciiValues(const vector<int>& asciiValues) {
 	for (size_t i = 0; i < asciiValues.size(); i++) {
-		cout << "ASCII Value " << i << ": " << asciiValues[i] << std::endl;
+		cout << "ASCII Value " << i << ": " << asciiValues[i] << endl;
 	}
 }

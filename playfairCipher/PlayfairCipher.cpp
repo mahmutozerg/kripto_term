@@ -17,10 +17,10 @@ int main()
     cout << "Key Text: " << key << endl;
 
     // Plain text
-    plaintext = "This is an example plaintext created for the purpose of testing the playfair cipher used in the term project of the cryptography";
+    plaintext = "Halloween";
     cout << "Plain text: " << plaintext << endl;
 
-    str = new char[plaintext.length() + 1];
+    str = new char[2 * plaintext.length() + 1]; // Worst-case scenario
     strcpy(str, plaintext.c_str());
 
     // Encrypt using Playfair Cipher
@@ -35,4 +35,3 @@ int main()
 
     return 0;
 }
-
