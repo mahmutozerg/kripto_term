@@ -17,7 +17,7 @@ int main()
     cout << "Key Text: " << key << endl;
 
     // Plain text
-    plaintext = "Halloween";
+    plaintext = "Deneme";
     cout << "Plain text: " << plaintext << endl;
 
     str = new char[2 * plaintext.length() + 1]; // Worst-case scenario
